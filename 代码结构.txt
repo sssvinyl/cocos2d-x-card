@@ -1,0 +1,489 @@
+纸牌接龙 Demo 结构说明
+
+一、项目概述
+
+本项目是一个基于 cocos2d-x 3.17 的纸牌接龙 Demo。
+
+游戏核心玩法：
+
+1. 游戏启动后先进入开场页。
+2. 点击“开始游戏”后进入关卡选择页。
+3. 玩家可以选择第 1 关或第 2 关。
+4. 进入关卡后，主牌区显示待消除的卡牌。
+5. 底牌区显示当前可匹配的顶部牌。
+6. 玩家点击主牌区中已经翻开的牌，如果该牌点数比底牌大 1 或小 1，则可以移动到底牌区。
+7. 匹配不限制花色。
+8. 当主牌区没有可匹配牌时，可以点击备用牌堆抽牌。
+9. 支持回退功能。
+10. 当主牌区所有牌都被消除后，显示“通关成功”。
+11. 游戏内可以点击“返回选关”回到关卡选择页。
+12. 返回选关后再次进入同一关，会保留上次操作后的进度。
+
+
+二、项目目录结构
+
+
+Classes/
+├── configs/
+├── models/
+├── views/
+├── controllers/
+├── managers/
+├── services/
+├── utils/
+├── AppDelegate.h / AppDelegate.cpp
+└── HelloWorldScene.h / HelloWorldScene.cpp
+
+Resources/
+├── levels/
+└── res/
+
+
+三、各目录职责
+
+
+1. configs/ 静态配置层
+
+configs 用来保存和加载静态配置数据。
+
+主要文件：
+
+configs/models/LevelConfig.h
+
+作用：
+定义关卡配置数据结构。
+
+关卡配置中主要包含三部分：
+
+1. Playfield
+   主牌区卡牌配置。
+
+2. Stack
+   初始底牌区卡牌配置。
+
+3. Stock
+   备用牌堆配置。
+
+configs/loaders/LevelConfigLoader.h / LevelConfigLoader.cpp
+
+作用：
+读取 Resources/levels/level_xx.json 文件，
+并把 JSON 数据解析成 LevelConfig 对象。
+
+如果以后要增加新的关卡配置字段，例如：
+- 卡牌是否锁定
+- 卡牌是否特殊牌
+- 关卡时间限制
+- 关卡目标分数
+
+应该优先修改 configs 层。
+
+
+2. models/ 数据模型层
+
+models 用来保存游戏运行时数据。
+
+主要文件：
+
+models/CardModel.h
+
+作用：
+表示一张卡牌的数据。
+
+主要字段：
+
+cardId
+卡牌唯一 ID。
+
+face
+卡牌点数。
+0 表示 A，
+1 表示 2，
+2 表示 3，
+一直到 12 表示 K。
+
+suit
+卡牌花色。
+0 表示梅花，
+1 表示方块，
+2 表示红桃，
+3 表示黑桃。
+
+position
+卡牌在区域中的位置。
+
+isFaceUp
+卡牌是否翻开。
+
+pileType
+卡牌所在区域。
+0 表示主牌区，
+1 表示底牌区，
+2 表示备用牌堆。
+
+pileIndex
+卡牌在当前牌堆中的索引。
+
+playfieldDrawOrder
+主牌区中的绘制层级。
+
+
+models/GameModel.h
+
+作用：
+保存整局游戏的运行时数据。
+
+主要包含：
+
+_playfieldCards
+主牌区卡牌数组。
+
+_handPileCards
+底牌区卡牌数组。
+
+_stockPileCards
+备用牌堆卡牌数组。
+
+
+models/UndoModel.h
+
+作用：
+保存一次可回退操作的数据。
+
+目前支持三种回退类型：
+
+1. HAND_SWAP
+   手牌区内部替换。
+
+2. MATCH_MOVE
+   主牌区卡牌匹配后移动到底牌区。
+
+3. STOCK_DRAW
+   从备用牌堆抽牌。
+
+
+3. views/ 视图层
+
+views 只负责显示和接收用户输入，不处理业务规则。
+
+主要文件：
+
+views/CardView.h / CardView.cpp
+
+作用：
+显示一张卡牌。
+
+负责：
+- 显示牌背
+- 显示牌面
+- 显示点数图片
+- 显示花色图片
+- 处理单张卡牌点击
+- 根据 CardModel 刷新显示状态
+
+
+views/PlayFieldView.h / PlayFieldView.cpp
+
+作用：
+主牌区视图。
+
+负责：
+- 添加主牌区卡牌
+- 移除主牌区卡牌
+- 根据 cardId 查找 CardView
+- 从主牌区取出 CardView
+- 回退时把卡牌重新加回主牌区
+
+
+views/HandPileView.h / HandPileView.cpp
+
+作用：
+底牌区视图。
+
+负责：
+- 显示底牌区卡牌
+- 添加新顶部牌
+- 调整底牌区卡牌位置
+- 根据 cardId 查找 CardView
+- 回退时从底牌区取出卡牌
+
+
+views/StockPileView.h / StockPileView.cpp
+
+作用：
+备用牌堆视图。
+
+负责：
+- 显示牌背
+- 显示剩余备用牌数量
+- 接收玩家点击抽牌
+
+
+views/UndoButtonView.h / UndoButtonView.cpp
+
+作用：
+回退按钮视图。
+
+负责：
+- 显示“回退”按钮
+- 判断按钮是否可点击
+- 接收点击后通过回调通知 GameController
+
+
+4. controllers/ 控制器层
+
+controllers 负责连接 Model 和 View，并处理玩家操作后的业务逻辑。
+
+主要文件：
+
+controllers/GameController.h / GameController.cpp
+
+作用：
+整个游戏的核心控制器。
+
+负责：
+- 加载关卡
+- 生成 GameModel
+- 创建所有 View
+- 处理主牌区点击
+- 处理底牌区点击
+- 处理备用牌点击
+- 记录回退数据
+- 执行回退
+- 判断是否通关
+- 通关后通知场景层显示通关成功
+
+
+5. managers/ 管理器层
+
+managers 提供全局性功能，但不是单例。
+
+主要文件：
+
+managers/UndoManager.h / UndoManager.cpp
+
+作用：
+管理回退栈。
+
+主要功能：
+
+pushUndo
+压入一条回退记录。
+
+popUndo
+弹出最近一次回退记录。
+
+hasUndo
+判断是否还有回退记录。
+
+clear
+清空回退记录。
+
+
+6. services/ 服务层
+
+services 提供无状态的业务服务，不持有游戏数据生命周期。
+
+主要文件：
+
+services/GameModelGenerator.h / GameModelGenerator.cpp
+
+作用：
+把 LevelConfig 转换成 GameModel。
+
+也就是：
+关卡静态配置 -> 游戏运行时数据。
+
+
+services/MatchingService.h / MatchingService.cpp
+
+作用：
+判断两张牌是否匹配。
+
+当前规则：
+两张牌点数差 1 就可以匹配，
+不限制花色。
+
+
+services/PlayfieldOcclusionService.h / PlayfieldOcclusionService.cpp
+
+作用：
+判断主牌区卡牌是否被其他牌遮挡。
+
+如果一张牌上面有其他牌压住，则不能点击。
+如果遮挡它的牌被移走，则它会变成可点击状态。
+
+
+7. utils/ 工具层
+
+utils 提供通用辅助函数。
+
+主要文件：
+
+utils/CardUtils.h / CardUtils.cpp
+
+作用：
+提供卡牌相关工具函数。
+
+例如：
+- 根据点数获取显示名称
+- 获取点数图片路径
+- 获取花色图片路径
+- 获取牌背图片路径
+
+
+8. HelloWorldScene 场景层
+
+HelloWorldScene 是当前游戏主场景。
+
+负责：
+- 显示开场页
+- 显示关卡选择页
+- 进入指定关卡
+- 显示通关成功弹层
+- 显示返回选关按钮
+- 缓存每个关卡的 GameController
+
+因为场景层缓存了每个关卡的 GameController，
+所以返回选关后再次进入同一关，可以保留上次操作后的状态。
+
+
+四、资源目录说明
+
+
+Resources/levels/
+
+保存关卡配置文件。
+
+例如：
+
+level_01.json
+level_02.json
+
+
+Resources/res/
+
+保存卡牌图片资源。
+
+包括：
+- 点数图片
+- 花色图片
+- 牌背图片
+
+
+五、如何新增一个关卡
+
+
+假设要新增第 3 关。
+
+第一步：
+在 Resources/levels/ 下新增：
+
+level_03.json
+
+第二步：
+按照现有关卡格式填写：
+
+{
+  "Playfield": [
+    {
+      "CardFace": 2,
+      "CardSuit": 0,
+      "Position": { "x": 300, "y": 800 }
+    }
+  ],
+  "Stack": [
+    {
+      "CardFace": 3,
+      "CardSuit": 1,
+      "Position": { "x": 0, "y": 0 }
+    }
+  ],
+  "Stock": [
+    {
+      "CardFace": 4,
+      "CardSuit": 2
+    }
+  ]
+}
+
+第三步：
+在 HelloWorldScene.cpp 中增加第 3 关按钮。
+
+第四步：
+增加点击函数：
+
+onLevelThreeClicked
+
+第五步：
+在点击函数中调用：
+
+startGame(3)
+
+这样就可以加载：
+
+Resources/levels/level_03.json
+
+
+六、如何新增一张普通卡牌
+
+
+如果只是给某个关卡新增一张普通卡牌，不需要改 C++ 代码。
+
+只需要修改对应的 level_xx.json。
+
+
+新增普通牌的流程：
+
+1. LevelConfigLoader 读取 JSON。
+2. LevelConfig 保存配置。
+3. GameModelGenerator 创建 CardModel。
+4. GameController 创建 CardView。
+5. PlayFieldView 显示卡牌。
+
+
+七、如何新增一种特殊卡牌
+------------------------
+
+如果要新增“万能牌”“锁定牌”“炸弹牌”等特殊卡牌，需要改代码。
+
+推荐步骤：
+
+1. 修改 CardModel.h
+
+增加字段，例如：
+
+int cardType;
+bool isLocked;
+
+2. 修改 LevelConfig.h
+
+让关卡配置可以保存 CardType 或 IsLocked。
+
+3. 修改 LevelConfigLoader.cpp
+
+从 JSON 中读取新字段。
+
+4. 修改 GameModelGenerator.cpp
+
+创建 CardModel 时，把新字段写进去。
+
+5. 修改 MatchingService.cpp
+
+如果特殊牌会影响匹配规则，在这里处理。
+
+例如：
+万能牌可以匹配任何牌。
+
+6. 修改 CardView.cpp
+
+如果特殊牌需要特殊显示，例如：
+- 锁链图标
+- 发光边框
+- 特殊颜色
+
+在这里加显示逻辑。
+
+7. 修改 UndoModel.h 和 GameController.cpp
+
+如果特殊牌会产生新的操作类型，要增加新的回退数据。

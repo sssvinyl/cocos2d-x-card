@@ -1,0 +1,67 @@
+# Build outputs
+out/
+.vs/
+
+# Visual Studio / CMake temp
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+ZERO_CHECK.*
+ALL_BUILD.*
+
+# Windows project generated outputs
+proj.win32/.vs/
+proj.win32/card.dir/
+proj.win32/Debug/
+proj.win32/Release/
+proj.win32/x64/
+proj.win32/Win32/
+proj.win32/bin/
+proj.win32/lib/
+proj.win32/engine/
+proj.win32/CMakeFiles/
+proj.win32/*.vcxproj
+proj.win32/*.vcxproj.filters
+proj.win32/*.vcxproj.user
+proj.win32/ZERO_CHECK.*
+proj.win32/ALL_BUILD.*
+proj.win32/_*
+proj.win32/*)
+proj.win32/dir
+proj.win32/cleanupEditCtrl*
+proj.win32/createEditCtrl*
+proj.win32/editBoxEditingDidBegin*
+proj.win32/getOpenGLView*
+proj.win32/getText*
+proj.win32/getWin32Window*
+proj.win32/updateNativeFrame*
+
+# Android build outputs
+proj.android/app/build/
+proj.android/.gradle/
+proj.android/build/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+*.opensdf
+*.sdf
+*.ipch
+*.db
+*.opendb
+
+# macOS resource leftovers
+Resources/res/__MACOSX/
+Resources/res/**/._*
+
+# Large local demo media
+*.mp4
+
+# Logs
+*.log

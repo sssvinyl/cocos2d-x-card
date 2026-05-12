@@ -1,0 +1,79 @@
+{
+  "Playfield": [
+    {
+      "CardFace": 4,
+      "CardSuit": 0,
+      "Position": { "x": 220, "y": 1060 }
+    },
+    {
+      "CardFace": 6,
+      "CardSuit": 1,
+      "Position": { "x": 420, "y": 1060 }
+    },
+    {
+      "CardFace": 8,
+      "CardSuit": 2,
+      "Position": { "x": 620, "y": 1060 }
+    },
+    {
+      "CardFace": 10,
+      "CardSuit": 3,
+      "Position": { "x": 820, "y": 1060 }
+    },
+    {
+      "CardFace": 3,
+      "CardSuit": 2,
+      "Position": { "x": 320, "y": 860 }
+    },
+    {
+      "CardFace": 5,
+      "CardSuit": 3,
+      "Position": { "x": 520, "y": 860 }
+    },
+    {
+      "CardFace": 7,
+      "CardSuit": 0,
+      "Position": { "x": 720, "y": 860 }
+    },
+    {
+      "CardFace": 2,
+      "CardSuit": 1,
+      "Position": { "x": 420, "y": 660 }
+    },
+    {
+      "CardFace": 9,
+      "CardSuit": 0,
+      "Position": { "x": 620, "y": 660 }
+    },
+    {
+      "CardFace": 1,
+      "CardSuit": 3,
+      "Position": { "x": 520, "y": 500 }
+    }
+  ],
+  "Stack": [
+    {
+      "CardFace": 5,
+      "CardSuit": 0,
+      "Position": { "x": 0, "y": 0 }
+    },
+    {
+      "CardFace": 6,
+      "CardSuit": 2,
+      "Position": { "x": 0, "y": 0 }
+    },
+    {
+      "CardFace": 4,
+      "CardSuit": 1,
+      "Position": { "x": 0, "y": 0 }
+    }
+  ],
+  "Stock": [
+    { "CardFace": 7, "CardSuit": 1 },
+    { "CardFace": 8, "CardSuit": 3 },
+    { "CardFace": 3, "CardSuit": 0 },
+    { "CardFace": 2, "CardSuit": 2 },
+    { "CardFace": 9, "CardSuit": 1 },
+    { "CardFace": 10, "CardSuit": 0 }
+  ]
+}
